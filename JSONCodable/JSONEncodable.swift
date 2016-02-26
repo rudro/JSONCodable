@@ -116,9 +116,20 @@ public extension Dictionary {//where Key: String, Value: JSONEncodable {
         for (k, item) in self {
             if let item = item as? JSONEncodable {
                 result[String(k)] = try item.toJSON()
-            }
-            else {
-                throw JSONEncodableError.DictionaryIncompatibleTypeError(elementType: item.dynamicType)
+            } else {
+                let mirror = Mirror(reflecting: item)
+                if let a = AnyRandomAccessCollection(mirror.children) {
+                    var arrayResult: [AnyObject] = []
+                    for index in a.startIndex ..< a.endIndex {
+                        let (_, arrayItem) = a[index]
+                        if let arrayItem = arrayItem as? JSONEncodable {
+                            arrayResult.append(try arrayItem.toJSON())
+                        }
+                    }
+                    result[String(k)] = arrayResult
+                } else {
+                    throw JSONEncodableError.DictionaryIncompatibleTypeError(elementType: item.dynamicType)
+                }
             }
         }
         return result
@@ -280,7 +291,28 @@ public class JSONEncoder {
         let result = try actual.toJSON()
         object[key] = result
     }
-    
+
+    // [String:[JSONEncodable]]
+    public func encode<Encodable: JSONEncodable>(dictionary: [String:[Encodable]], key: String) throws {
+        guard dictionary.count > 0 else {
+            return
+        }
+        let result = try dictionary.toJSON()
+        object[key] = result
+    }
+
+    // [String:[JSONEncodable]]?
+    public func encode<Encodable: JSONEncodable>(value: [String:[Encodable]]?, key: String) throws {
+        guard let actual = value else {
+            return
+        }
+        guard actual.count > 0 else {
+            return
+        }
+        let result = try actual.toJSON()
+        object[key] = result
+    }
+
     // JSONTransformable
     public func encode<EncodedType, DecodedType>(value: DecodedType, key: String, transformer: JSONTransformer<EncodedType, DecodedType>) throws {
         guard let result = transformer.encoding(value) else {

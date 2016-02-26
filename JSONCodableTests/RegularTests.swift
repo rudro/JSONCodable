@@ -22,7 +22,8 @@ class RegularTests: XCTestCase {
             ["id": 27, "full_name": "Bob Jefferson"],
             ["id": 29, "full_name": "Jen Jackson"]
         ],
-        "friendsLookup": ["Bob Jefferson": ["id": 27, "full_name": "Bob Jefferson"]]
+        "friendsLookup": ["Bob Jefferson": ["id": 27, "full_name": "Bob Jefferson"]],
+        "friendsArrayLookup": ["Bob Jefferson": [["id": 27, "full_name": "First Buddy"], ["id": 42, "full_name": "Second Buddy"]]]
     ]
     let decodedValue = User(
         id: 24,
@@ -30,11 +31,11 @@ class RegularTests: XCTestCase {
         email: "john@appleseed.com",
         company: Company(name: "Apple", address: "1 Infinite Loop, Cupertino, CA"),
         friends: [
-            User(id: 27, name: "Bob Jefferson", email: nil, company: nil, friends: [], friendsLookup: nil),
-            User(id: 29, name: "Jen Jackson", email: nil, company: nil, friends: [], friendsLookup: nil)
+            User(id: 27, name: "Bob Jefferson", email: nil, company: nil, friends: [], friendsLookup: nil, friendsArrayLookup: nil),
+            User(id: 29, name: "Jen Jackson", email: nil, company: nil, friends: [], friendsLookup: nil, friendsArrayLookup: nil)
         ],
-        friendsLookup: ["Bob Jefferson":  User(id: 27, name: "Bob Jefferson", email: nil, company: nil, friends: [], friendsLookup: nil)]
-    )
+        friendsLookup: ["Bob Jefferson":  User(id: 27, name: "Bob Jefferson", email: nil, company: nil, friends: [], friendsLookup: nil, friendsArrayLookup: nil)],
+        friendsArrayLookup: ["Bob Jefferson":  [User(id: 27, name: "First Buddy", email: nil, company: nil, friends: [], friendsLookup: nil, friendsArrayLookup: nil), User(id: 42, name: "Second Buddy", email: nil, company: nil, friends: [], friendsLookup: nil, friendsArrayLookup: nil)]]     )
 
     func testDecodingRegular() {
         guard let user = try? User(object: encodedValue) else {
